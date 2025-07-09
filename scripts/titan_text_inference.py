@@ -7,20 +7,22 @@ bedrock_runtime = boto3.client(
     region_name="us-west-2"  
 )
 
-# Prompt that will be passed to the foundation model  
-prompt = "Write a short story about a robot who wants to become a Skateboarder."
+# Set the prompt for testing Top P
+prompt = "Describe a sunset in one sentence."
 
-# Set test temperature value 
-temperature = 0.9
+# Keep temp steady to isolate topP impact (keep some creativity)
+temperature = 0.7
+
+# Modify Top P value here to experiment: test 1.0, 0.5, and 0.1
+top_p_value = 0.1 
 
 # Build the input request and coverting the payload to JSON
 body = json.dumps ({
     "inputText": prompt,
     "textGenerationConfig": {
-        "maxTokenCount": 200,         # Limit the outpuut to 200 tokens 
-        "temperature": temperature,   # Control randomness (0 = focused, 1 = creative)
-        "topP": 1, 
-        "stopSequences": []
+        "maxTokenCount": 50,         
+        "temperature": temperature, 
+        "topP": top_p_value,         # Parameter thats being tested                     
     }
 })
 
@@ -35,7 +37,6 @@ response = bedrock_runtime.invoke_model(
 
 # Decode and print the model's response
 response_body = json.loads(response["body"].read())
-print(f"\n--- Output (Temperature: {temperature}) ---\n")
-print(json.dumps(response_body["results"][0]["outputText"], indent=2))
+print(json.dumps(response_body, indent=2))
 
 
